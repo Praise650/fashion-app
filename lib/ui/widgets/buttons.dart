@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
 
-Widget submitButton({required String text, required Function() onPressed}) {
-  return MaterialButton(
-    color: Colors.red,
-    elevation: 5.0,
-    height: 50,
-    onPressed: onPressed,
-    shape: StadiumBorder(),
-    child: Text('$text'),
-  );
+class SubmitButton extends StatelessWidget {
+  const SubmitButton({
+    Key? key,
+    this.text,
+    this.onPressed,
+    this.isBusy = false,
+  }) : super(key: key);
+
+  final String? text;
+  final Function()? onPressed;
+  final bool? isBusy;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      color: Colors.red,
+      elevation: 5.0,
+      height: 50,
+      onPressed: onPressed,
+      shape: StadiumBorder(),
+      child: isBusy == true ? CircularProgressIndicator() : Text('$text'),
+    );
+  }
 }
 
 class SwitchSigningOptions extends StatelessWidget {
@@ -62,4 +76,3 @@ class BaseButton extends StatelessWidget {
     return Container();
   }
 }
-

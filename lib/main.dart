@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   /// directly inside [build].
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
-  //TODO: if user ain't a user create a page to download sellet app
+  //TODO: if user ain't a user create a page to download seller app
 
   @override
   Widget build(BuildContext context) {

@@ -10,10 +10,12 @@ import '../../../../core/locator.dart';
 import '../../../../core/services/auth/auth_service.dart';
 
 class LoginViewModel extends BaseViewModel {
-  final AuthService? _registerService = serviceLocator<AuthService>();
+  final AuthService _registerService = serviceLocator<AuthService>();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   FirebaseAuth auth = FirebaseAuth.instance;
+
+  final formKey = GlobalKey<FormState>();
   bool? isLoggedIn;
 
   void getCurrentUser() async {
@@ -25,23 +27,27 @@ class LoginViewModel extends BaseViewModel {
   bool isLoading = false;
 
   void login() async {
-    isLoading = true;
+    setBusy(true);
     notifyListeners();
-    User? user = await _registerService!
-        .login(email: email.text, password: password.text);
-    print('hello');
-    if (user != null) {
-      Future.delayed(
-          Duration(microseconds: 200), () => Get.to(() => HomePage(user)));
-      isLoading = false;
-      notifyListeners();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString(AppStrings.email, user.email.toString());
-      prefs.setString(AppStrings.lastName, user.email.toString());
-      prefs.setString(AppStrings.firstName, user.email.toString());
-      notifyListeners();
+    if (validateAndSave()) {
+      User? user = await _registerService.login(
+          email: email.text, password: password.text);
+      print('hello');
+      if (user != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString(AppStrings.email, user.email!);
+        prefs.setString(AppStrings.id, user.uid);
+        prefs.setString(AppStrings.firstName, user.email!);
+        setBusy(false);
+        notifyListeners();
+        Future.delayed(
+            Duration(microseconds: 200), () => Get.to(() => HomePage(user)));
+        notifyListeners();
+      } else {
+        throw FirebaseAuthException(code: 'Failed to authenticate');
+      }
     } else {
-      throw FirebaseAuthException(code: 'Failed to authenticate');
+      throw FirebaseAuthException(code: 'Failed to validate credentials');
     }
   }
 
@@ -51,5 +57,13 @@ class LoginViewModel extends BaseViewModel {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  bool validateAndSave() {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      return true;
+    }
+    return false;
   }
 }

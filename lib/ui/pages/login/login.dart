@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../layouts/auth_base_background.dart';
 import '../../widgets/login/loginBody.dart';
 import '../create_account/view_model/create_account_view_model.dart';
 import '../homepage/homepage.dart';
@@ -58,9 +59,12 @@ class _LoginState extends State<Login> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: SafeArea(
-            child: LoginBody(
-              loading,
-              model: model
+            child: AuthBaseBackground(
+              padding: 10,
+              child: LoginBody(
+                loading,
+                model: model
+              ),
             ),
           ),
         );

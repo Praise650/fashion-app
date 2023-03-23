@@ -23,14 +23,16 @@ class DBServiceImpl extends DBService {
       String? phoneNumber,
       String? lastName,
       String? email,
+      String? uid,
       String? gender}) async {
-    await store.collection('User').doc('details').set({
+    await store.collection('User').doc(uid).set({
       'accountType': acctType,
       'firstName': firstName,
       'phoneNumber': phoneNumber,
       'lastName': lastName,
       'gender': gender,
-      'email':email
+      'email': email,
+      'id': uid
     });
   }
 }

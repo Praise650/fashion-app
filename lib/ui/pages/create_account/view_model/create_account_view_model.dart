@@ -13,30 +13,46 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class CreateAccountViewModel extends BaseViewModel{
-  final AuthService? _registerService = serviceLocator<AuthService>();
+class CreateAccountViewModel extends BaseViewModel {
+  final _registerService = serviceLocator<AuthService>();
+  TextEditingController email = TextEditingController();
+  TextEditingController name = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController confirmPassword = TextEditingController();
+  String? genderValue;
+  bool showSpinner = false;
   bool isLoading = false;
-  void createAccount({
-    required String lastName,
-    required String firstName,
-      required String password,
-    required String gender,
-      required String email,
-      required String acctType})async{
-    User? user = await _registerService!.register(
-      password: password,
-      email: email,
-      acctType: acctType,
-      lastName: lastName,
-      firstName: firstName,
-      gender: gender,
+
+  void createAccount() async {
+    User? user = await _registerService.register(
+      acctType: 'admin',
+      firstName: name.text,
+      gender: genderValue!,
+      lastName: name.text,
+      email: email.text.trim(),
+      password: password.text.trim(),
     );
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(AppStrings.email, user!.email.toString());
     prefs.setString(AppStrings.lastName, user.email.toString());
     prefs.setString(AppStrings.firstName, user.email.toString());
-    Get.off(()=>HomePage(user));
+    Get.off(() => HomePage(user));
   }
+
+  updateGender(String gender) {
+    genderValue = gender;
+    notifyListeners();
+  }
+// onGroupValueChanged(String gender) {
+//   if (gender == 'Male') {
+//     genderValue = gender;
+//     notifyListeners();
+//   } else if (gender == 'Female') {
+//     setState(() {
+//       genderValue = gender;
+//     });
+//   }
+// }
 
 // Future<File?> selectFile({ImageSource source = ImageSource.gallery}) async {
 //   PickedFile? selectFile =
@@ -89,6 +105,7 @@ class CreateAccountViewModel extends BaseViewModel{
 class Auth {
   GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   Future<User?> signInGoogle() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     User? user;
@@ -97,13 +114,13 @@ class Auth {
       GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       if (googleSignInAccount != null) {
         GoogleSignInAuthentication _googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+            await googleSignInAccount.authentication;
         AuthCredential authCredential = GoogleAuthProvider.credential(
           accessToken: _googleSignInAuthentication.accessToken,
           idToken: _googleSignInAuthentication.accessToken,
         );
         UserCredential userCredential =
-        await firebaseAuth.signInWithCredential(authCredential);
+            await firebaseAuth.signInWithCredential(authCredential);
 
         user = userCredential.user;
         if (user != null) {

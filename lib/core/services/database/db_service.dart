@@ -8,6 +8,7 @@ abstract class DBService {
       String? firstName,
       String? lastName,
       String? email,
+      String? uid,
       String? phoneNumber,
       String? gender});
 }
